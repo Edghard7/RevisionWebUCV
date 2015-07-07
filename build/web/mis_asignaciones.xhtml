@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html  xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"  >
+<h:head>
+</h:head>
+<h:body>
+  <ui:composition template="/WEB-INF/facelets/templates/template_pagina.xhtml">
+      <ui:define name="contenido">
+          <h:outputText value="No tiene acceso a este contenido" class="titulo"  rendered="#{bUsuario.getPermisos('3') eq '0'}" />
+          <p:panel id="encabezado" style="text-align: center"   rendered="#{bUsuario.getPermisos('3') ne '0'}">
+              <h:outputText value="#{msg.misAsig}" class="titulo" />
+          </p:panel>
+          <p:tabView id="AsignacionTabView" dynamic="true" orientation="top" activeIndex="#{bAsignacion.activeTabIndex}" 
+                       rendered="#{bUsuario.getPermisos('3') ne '0'}">
+              
+              <!-- Asignar Tesis a revisor  -->
+              <p:tab id="tab_asignar" title="#{msg.asignacion}">
+                  <h:form id="form_mostrar_listado">
+                      <p:panel id="datos_tesis" header="Listado de Asignaciones" styleClass="border">                          
+                          <h:panelGrid columns="4" cellpadding="2"  cellspacing="2" style="text-align: center;" width="100%">
+                              
+                              <p:commandButton id="saveBtn" icon="ui-icon-search" actionListener="#{bAsignacion.doListarAsiganaciones()}"  
+                                                 value="Actualizar" async="true" update="form_mostrar_listado:datos_tesis"/>     
+                            </h:panelGrid> 
+                          <p:blockUI block="datos_tesis" trigger="saveBtn">                                               
+                                Cargando Listado... <br />
+                                <p:graphicImage value="resources/img/cargando.gif" />   
+                            </p:blockUI>
+                          
+                          <center>  
+                              <h:panelGrid columns="1" rendered="#{bAsignacion.sizeRegistrosAsignaciones  ne '0'}"> 
+                                <h:panelGroup>                                   
+                                    <h:outputText styleClass="etiqueta_resultBusq" value="Cantidad de asignaciones: "/>
+                                    <h:outputText styleClass="etiqueta_resultBusq" 
+                                                  value="#{bAsignacion.sizeRegistrosAsignaciones}"/> 
+                                </h:panelGroup>
+                            </h:panelGrid>
+                            </center>
+                          <br/>
+                          <h:panelGrid columns="1"  cellpadding="0"  cellspacing="0" border="0"  styleClass="width-table">
+                          <p:dataTable id="tbl_datos_tesis" value="#{bAsignacion.arrAsignacion}" var="list_tesis" 
+                                       rendered="#{bAsignacion.sizeRegistrosAsignaciones ne '0'}"                                                                                      
+                                           styleClass="order-table" paginator="true" rows="10" rowsPerPageTemplate="5,10,15,20,25,30,50"
+                                           style="width: 100%"
+                                           paginatorPosition="both" paginatorAlwaysVisible="true" 
+                                           tableStyle="tablecolBusqSimpOrdTrab1,tablecolBusqSimpOrdTrab2,
+                                           tablecolBusqSimpOrdTrab3, tablecolBusqSimpOrdTrab4, 
+                                           tablecolBusqSimpOrdTrab5, tablecolBusqSimpOrdTrab6">
+                                  
+                              <p:column headerText="Titulo" filterBy="#{list_tesis.objTesisRecpcion.objTesis.titulo}" 
+                                        sortBy="#{list_tesis.objTesisRecpcion.objTesis.titulo}">
+                                      <h:outputText value="#{list_tesis.objTesisRecpcion.objTesis.titulo}"/>
+                                  </p:column>
+                                  
+                              <p:column headerText="Autor" filterBy="#{list_tesis.objTesisRecpcion.objTesis.objAutor.apellidos}" 
+                                            sortBy="#{list_tesis.objTesisRecpcion.objTesis.objAutor.apellidos}">
+                                      <h:outputText value="#{list_tesis.objTesisRecpcion.objTesis.objAutor.apellidos}"/>
+                                  </p:column>
+                                  
+                              <p:column headerText="Escuela" filterBy="#{list_tesis.objTesisRecpcion.objTesis.objLinea.objEscuela.nombre}" 
+                                            sortBy="#{list_tesis.objTesisRecpcion.objTesis.objLinea.objEscuela.nombre}">
+                                      <h:outputText value="#{list_tesis.objTesisRecpcion.objTesis.objLinea.objEscuela.nombre}"/>
+                                  </p:column>                                  
+                                  
+                                  <p:column headerText="Esquema" filterBy="#{list_tesis.objTesisRecpcion.objTesis.objEsquema.descripcion}" 
+                                            sortBy="#{list_tesis.objTesisRecpcion.objTesis.objEsquema.descripcion}">
+                                      <h:outputText value="#{list_tesis.objTesisRecpcion.objTesis.objEsquema.descripcion}"/>
+                                  </p:column>
+                                  
+                                  <p:column headerText="Recepción" width="100" >
+                                      <h:outputText value="#{list_tesis.objTesisRecpcion.fecha_recepcion}"/>
+                                  </p:column>
+                                  
+                                  <p:column headerText="Asignación" width="100" >
+                                      <h:outputText value="#{list_tesis.fecha_asignacion}"/>
+                                  </p:column>
+                                  
+                                  <p:column headerText="Revisión">
+                                      <div>
+                                          <div style="padding: 15px">
+                                      <p:commandLink  id="inicio" rendered="#{list_tesis.estado eq 0}" title="Iniciar Revisión" 
+                                                      value="Iniciar" styleClass="boton"  oncomplete="PF('asigRev').show()"
+                                                      async="true" action="#{bAsignacion.pasoDatos(list_tesis)}"
+                                                      update=":AsignacionTabView:form_mostrar_listado,:AsignacionTabView:form_revisar_ini:popRevi" >
+                                      </p:commandLink>
+                                          </div>
+                                      </div>
+                                      <div>
+                                          <div style="padding: 15px">
+                                      <p:commandLink  id="fin" rendered="#{list_tesis.estado eq 11}" title="Finalizar Revisión" 
+                                                      value="Finalizar" styleClass="boton"   oncomplete="PF('asigRev').show()"
+                                                      async="true" action="#{bAsignacion.pasoDatos_fin(list_tesis)}"
+                                                      update=":AsignacionTabView:form_mostrar_listado,:AsignacionTabView:form_revisar_ini:popRevi"  >                                          
+                                      </p:commandLink>
+                                          </div>
+                                          <div style="padding: 15px">
+                                      <p:commandLink  id="detalle" rendered="#{list_tesis.estado eq 11}" title="Detalle de observaciones" 
+                                                      value="Observaciones" styleClass="boton"
+                                                      async="true" action="#{bAsignacion.mostrarRevision(list_tesis)}"
+                                                      actionListener="#{bAsignacion.onClickCambio}"
+                                                      update=":AsignacionTabView,:AsignacionTabView:form_ver_revision,:AsignacionTabView:form_ver_revision_obs"  >  
+                                          <f:attribute name="param" value="#{1}" />                                          
+                                      </p:commandLink>
+                                          </div>
+                                      </div>
+                                      <br/>
+                                      <div>
+                                          <div style="padding: 15px">
+                                              <h:outputText rendered="#{list_tesis.estado > 0 and list_tesis.estado != 11}"  value="#{list_tesis.estado_d}"/>
+                                          </div>
+                                          <div style="padding: 15px">
+                                              <p:commandLink  id="ver_obs" rendered="#{list_tesis.estado > 0 and list_tesis.estado != 11}"
+                                                              title="Ver observaciones" 
+                                                                value="Ver" styleClass="boton"
+                                                                async="true" action="#{bAsignacion.verObservaciones(list_tesis)}"
+                                                                actionListener="#{bAsignacion.onClickCambio}"
+                                                                update=":AsignacionTabView,:AsignacionTabView:form_ver_revision,:AsignacionTabView:form_ver_revision_obs"  >  
+                                                    <f:attribute name="param" value="#{1}" />                                          
+                                                </p:commandLink>
+                                          </div>
+                                      </div>                                      
+                                  </p:column>                                  
+                              </p:dataTable>
+                              
+                          </h:panelGrid>
+                          
+                      </p:panel>
+                      
+                  </h:form>
+                  <h:form id="form_revisar_ini" >
+                    <p:dialog header="Revisión de Tesis" widgetVar="asigRev" resizable="false" 
+                              id="asigRev" showEffect="fade" hideEffect="explode" modal="false"
+                              width="40%">
+                        <p:panel id="popRevi" style="width: 100%">
+                            <p:growl globalOnly="true"  id="estRegRevision" sticky="false"  showDetail="true"  /> 
+                            <center>
+                            <h:panelGrid columns="1" cellpadding="4" style="text-align: center; width: 100%">
+                                <p:graphicImage value="resources/img/revision2.jpg" width="70"  />   
+                                <h:outputText value="Tesis: " style="font-weight: bold;" />
+                                <h:outputText value="#{bAsignacion.objRevision.objAsignacion.objTesisRecpcion.objTesis.titulo}" />
+                                <h:outputText value="Autor: " style="font-weight: bold;" />
+                                <h:outputText value="#{bAsignacion.objRevision.objAsignacion.objTesisRecpcion.objTesis.objAutor.apellidos}" />
+                                <br/>
+                                <h:outputText value="Observación Final: " style="font-weight: bold;" />
+                                <h:panelGroup>
+                                    <p:inputTextarea id="observacion" value="#{bAsignacion.objRevision.comentario}" 
+                                                     rows="5" cols="40" maxlength="1500" title="Observación"
+                                                     autoResize="false"  />                             
+                                    <h:message for="observacion" showDetail="false" showSummary="true"/>                                         
+                               </h:panelGroup>
+                                <br/>
+                                <p:commandButton  value="Finalizar" async="true" title="Finalizar Revisión"
+                                                  actionListener="#{bAsignacion.doRegistroRevision_fin()}"
+                                                  update="estRegRevision,asigRev,AsignacionTabView:form_mostrar_listado"
+                                                  oncomplete="asigRev.hide()"/>
+                            </h:panelGrid>
+                            </center>
+                        </p:panel>
+                    </p:dialog>
+                </h:form>
+              </p:tab>
+              
+              <!-- tab detalle de revision observaciones -->
+              <p:tab id="tab_observaciones" title="Observaciones" titletip="Registrar las observaciones" 
+                     disabled="#{bAsignacion.bandVer}">
+                  <h:form class="border_titulo1" id="form_ver_revision"   style="text-align : justify;"  
+                          rendered="#{bAsignacion.bandFormVer}">
+                      <p:growl globalOnly="true"  id="VerDatos_observacion" sticky="false"  showDetail="true"  />
+                      <p:panel id="ver_detalle_revision" header="Datos de la revisión" styleClass="border"
+                               closable="true" toggleable="true">
+                          <p:fieldset legend="Esquema de tesis"  styleClass="border">
+                              <h:panelGrid columns="1"  cellpadding="2"  cellspacing="6"   
+                                           styleClass="panelColumns" columnClasses="labelOT, valueOT"  >
+                                  
+                                  <p:dataTable id="tbl_datos_tesis" value="#{bAsignacion.arrDetEsquema}" var="list_det" 
+                                               rendered="#{bAsignacion.sizeRegistrosDetalle ne '0'}"                                                                                      
+                                           styleClass="order-table" paginator="true" rows="20" rowsPerPageTemplate="20,25,30,50"
+                                           style="width: 100%"
+                                           paginatorPosition="both" paginatorAlwaysVisible="true" 
+                                           tableStyle="tablecolBusqSimpOrdTrab1,tablecolBusqSimpOrdTrab2,
+                                           tablecolBusqSimpOrdTrab3, tablecolBusqSimpOrdTrab4, 
+                                           tablecolBusqSimpOrdTrab5, tablecolBusqSimpOrdTrab6">
+                                      
+                                      <p:column headerText="N°" width="20" >
+                                          <h:outputText value="#{list_det.orden}"/>
+                                      </p:column>
+                                      <p:column headerText="Capítulo" width="20" >
+                                          <h:outputText value="#{list_det.capitulo}"/>
+                                      </p:column>
+                                      <p:column headerText="Nombre" >
+                                          <h:outputText value="#{list_det.nombre}"/>
+                                      </p:column>
+                                      <p:column headerText="Contenido" >
+                                          <h:outputText value="#{list_det.contenido}" escape="false" />
+                                      </p:column>
+                                      <p:column headerText="Opciones" >
+                                          <div style="padding: 5px; text-align: center">
+                                            <p:commandLink  id="obs" title="Registrar Observación" 
+                                                            value="Observación" styleClass="boton"   oncomplete="PF('regObs').show()"
+                                                            async="true" action="#{bAsignacion.pasoDatos_observacion(list_det)}"
+                                                            update=":AsignacionTabView:form_reg_obs:popObs"  >                                          
+                                            </p:commandLink>
+                                          </div>
+                                      </p:column>
+                                      
+                                  </p:dataTable>
+                                  
+                              </h:panelGrid>
+                          </p:fieldset>
+                          
+                          <h:panelGrid columns="1" cellpadding="4"  cellspacing="4" style="text-align: center;" width="100%">
+                              <h:panelGroup>
+                                  <h:panelGrid columns="1" cellpadding="2"  cellspacing="2" style="text-align: center;" width="100%">
+                                      <p:commandButton icon="ui-icon-triangle-1-w" actionListener="#{bAsignacion.desactivaTabVer()}"  
+                                                       value="Volver" immediate="true" async="true" 
+                                                       update=":AsignacionTabView, :AsignacionTabView:form_mostrar_listado"/>
+                                  </h:panelGrid>
+                              </h:panelGroup>
+                          </h:panelGrid>
+                      </p:panel>
+                  </h:form>
+                  
+                  <!-- panel para registro de la observacion -->
+                  <h:form id="form_reg_obs" >
+                      <p:dialog header="Registro de observación" widgetVar="regObs" resizable="false" 
+                              id="regObs" showEffect="fade" hideEffect="explode" modal="false"
+                              width="40%">
+                        <p:panel id="popObs" style="width: 100%">
+                            <p:growl globalOnly="true"  id="estRegObservacion" sticky="false"  showDetail="true"  /> 
+                            <center>
+                            <h:panelGrid columns="1" cellpadding="4" style="text-align: center; width: 100%">
+                                <p:graphicImage value="resources/img/observacion.jpg" width="80"  />   
+                                
+                                <h:outputText value="Ítem: " style="font-weight: bold;" />
+                                <h:outputText value="#{bAsignacion.objObservacion.objDetalleEsquema.nombre}" />
+                                <br/>
+                                <h:outputText value="Observación: " style="font-weight: bold;" />
+                                <h:panelGroup>
+                                    <p:inputTextarea id="observacion" value="#{bAsignacion.objObservacion.observacion}" 
+                                                     rows="5" cols="40" maxlength="1500" required="true" 
+                                                     requiredMessage="#{msg.requerido}" title="Observación"
+                                                     autoResize="false"  />                             
+                                    <h:message for="observacion" showDetail="false" showSummary="true"/>                                         
+                               </h:panelGroup>
+                                <br/>
+                                <p:commandButton  value="Guardar" async="true" title="Guardar Observación"
+                                                  action="#{bAsignacion.doListarObservaciones_aux()}"
+                                                  actionListener="#{bAsignacion.doRegistroObservacion()}"
+                                                  update="estRegObservacion,regObs,AsignacionTabView:form_ver_revision,AsignacionTabView:form_ver_revision_obs"
+                                                  oncomplete="regObs.hide()"/>
+                            </h:panelGrid>
+                            </center>
+                        </p:panel>
+                    </p:dialog>
+                </h:form>
+                  <!-- fin panel -->
+                  
+                  <!-- formulario con las observaciones que ya se han registrado -->
+                  <h:form class="border_titulo1" id="form_ver_revision_obs"   style="text-align : justify;"  
+                          rendered="#{bAsignacion.bandFormObs}">
+                      <p:growl globalOnly="true"  id="VerDatos_observacion_obs" sticky="false"  showDetail="true"  />
+                      <p:panel id="ver_detalle_revision_obs" header="Observaciones registradas" styleClass="border">
+                          <p:fieldset legend="Observaciones registradas"  styleClass="border">
+                              <h:panelGrid columns="1"  cellpadding="2"  cellspacing="6"   
+                                           styleClass="panelColumns" columnClasses="labelOT, valueOT"  >
+                                  <h:outputText rendered="#{bAsignacion.sizeRegistrosObservacion eq '0'}" value="No se han registrado observaciones" />
+                                  <p:dataTable id="tbl_datos_tesis_obs" value="#{bAsignacion.arrObservacion}" var="list_obs" 
+                                               rendered="#{bAsignacion.sizeRegistrosObservacion ne '0'}"                                                                                      
+                                           styleClass="order-table" paginator="true" rows="10" rowsPerPageTemplate="5,10,15,20,25,30,50"
+                                           style="width: 100%"
+                                           paginatorPosition="both" paginatorAlwaysVisible="true" 
+                                           tableStyle="tablecolBusqSimpOrdTrab1,tablecolBusqSimpOrdTrab2,
+                                           tablecolBusqSimpOrdTrab3, tablecolBusqSimpOrdTrab4, 
+                                           tablecolBusqSimpOrdTrab5, tablecolBusqSimpOrdTrab6"
+                                           editable="true" >
+                                      
+                                      <p:ajax event="rowEdit" listener="#{bAsignacion.onEdit}" update="tbl_datos_tesis_obs" />  
+                                      <p:ajax event="rowEditCancel" listener="#{bAsignacion.onCancel}" update="tbl_datos_tesis_obs" />
+                                      
+                                      <p:column headerText="Capítulo" width="20" >
+                                          <h:outputText value="#{list_obs.objDetalleEsquema.capitulo}"/>
+                                      </p:column>
+                                      <p:column headerText="Nombre" >
+                                          <h:outputText value="#{list_obs.objDetalleEsquema.nombre}"/>
+                                      </p:column>
+                                      <p:column headerText="Contenido" >
+                                          <h:outputText value="#{list_obs.objDetalleEsquema.contenido}" escape="false" />
+                                      </p:column>
+                                      <p:column headerText="Observación"  >
+                                          <p:cellEditor>
+                                              <f:facet name="output">
+                                                  <h:outputText value="#{list_obs.observacion}" escape="false" />
+                                              </f:facet>
+                                              <f:facet name="input">
+                                                  <h:panelGroup>                                                      
+                                                      <p:inputTextarea id="observacion" value="#{list_obs.observacion}" 
+                                                                rows="5" cols="40" maxlength="1500" required="true" 
+                                                                requiredMessage="#{msg.requerido}" title="Observación"
+                                                                autoResize="false"  />
+                                                  </h:panelGroup>
+                                              </f:facet>
+                                          </p:cellEditor>                                          
+                                      </p:column>
+                                      <p:column headerText="Estado" >
+                                          <p:cellEditor>
+                                              <f:facet name="output">
+                                                  <h:outputText value="#{list_obs.estado_d}"  />
+                                              </f:facet>
+                                              <f:facet name="input">
+                                                  <h:panelGroup>
+                                                      <p:selectOneMenu id="estados" value="#{list_obs.estado}" style="width: 220px"  required="true">
+                                                            <f:selectItem itemLabel="CORREGIDO" itemValue="6" />
+                                                            <f:selectItem itemLabel="PENDIENTE DE CORRECCIÓN" itemValue="7" />                                                            
+                                                        </p:selectOneMenu>
+                                                  </h:panelGroup>
+                                              </f:facet>
+                                          </p:cellEditor> 
+                                      </p:column>
+                                      <p:column headerText="Opcion" width="50">  
+                                          <p:rowEditor rendered="#{bAsignacion.bandFormVer}" />
+                                    </p:column> 
+                                      
+                                  </p:dataTable>
+                                  
+                              </h:panelGrid>
+                          </p:fieldset>
+                          
+                          <h:panelGrid columns="1" cellpadding="4"  cellspacing="4" style="text-align: center;" width="100%">
+                              <h:panelGroup>
+                                  <h:panelGrid columns="1" cellpadding="2"  cellspacing="2" style="text-align: center;" width="100%">
+                                      <p:commandButton icon="ui-icon-triangle-1-w" actionListener="#{bAsignacion.desactivaTabVer()}"  
+                                                       value="Volver" immediate="true" async="true" 
+                                                       update=":AsignacionTabView, :AsignacionTabView:form_mostrar_listado"/>
+                                  </h:panelGrid>
+                              </h:panelGroup>
+                          </h:panelGrid>
+                      </p:panel>
+                  </h:form>
+                  
+                  
+              </p:tab>
+       
+          </p:tabView>
+          
+       </ui:define>
+   </ui:composition>
+        
+</h:body>
+</html>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        
+    </h:head>
+    <h:body >
+        <ui:composition>
+            <h:form style="width: 99%">  
+                <p:growl id="messages"/>
+                <p:menubar style="width: 100%">
+                    <p:submenu  rendered="#{bUsuario.getPermisos('1') ne '0'}" label="Módulos" icon="ui-icon-document">                        
+                        <p:menuitem rendered="#{bUsuario.getPermisos('1') ne '0'}" value="Persona" url="persona.jsf" />
+                        <p:separator />
+                        <p:menuitem rendered="#{bUsuario.getPermisos('1') ne '0'}" value="Tesis" url="tesis.jsf" />
+                        <p:separator />
+                        <p:menuitem rendered="#{bUsuario.getPermisos('1') ne '0'}" value="Asignación" url="asignacion.jsf" />
+                        <p:separator />
+                        
+                    </p:submenu>
+
+                    <p:submenu  rendered="#{bUsuario.getPermisos('3') ne '0'}" label="Revisor" icon="ui-icon-pencil">
+                        <p:menuitem rendered="#{bUsuario.getPermisos('3') ne '0'}" value="Mis asignaciones" url="mis_asignaciones.jsf" icon="ui-icon-arrowreturnthick-1-e" />                        
+                    </p:submenu>
+                    
+                    <p:submenu rendered="#{bUsuario.getPermisos('2') ne '0'}" label="Jefe de Investigación" icon="ui-icon-pencil">
+                        <p:menuitem rendered="#{bUsuario.getPermisos('2') ne '0'}" value="Rev. Finalizadas" url="tesis_finalizadas.jsf" icon="ui-icon-arrowreturnthick-1-e" />                        
+                    </p:submenu>
+                    
+                    <p:submenu rendered="#{bUsuario.getPermisos('4') ne '0'}" label="Seguidor" icon="ui-icon-pencil">
+                        <p:menuitem rendered="#{bUsuario.getPermisos('4') ne '0'}" value="Estado de Revisión" url="est_revision.jsf" icon="ui-icon-arrowreturnthick-1-e" />                        
+                    </p:submenu>
+                    
+                    <p:submenu rendered="#{bUsuario.getPermisos('2') ne '0'}" label="Reportes" icon="ui-icon-pencil">
+                        <p:menuitem rendered="#{bUsuario.getPermisos('2') ne '0'}" value="Observaciones de tesis" url="REP_observaciones.jsf" /> 
+                        <p:separator/>
+                        <p:menuitem rendered="#{bUsuario.getPermisos('2') ne '0'}" value="Tesis por escuela" url="REP_tesis_x_escuela.jsf" /> 
+                        <p:separator/>
+                        <p:menuitem rendered="#{bUsuario.getPermisos('2') ne '0'}" value="Líneas por escuela" url="REP_lineas_x_escuela.jsf" /> 
+                        <p:separator/>
+                    </p:submenu>
+
+                    <f:facet name="options">
+                        <h:outputText value="#{bUsuario.objUsuario.objPersona.apellidos}, #{bUsuario.objUsuario.objPersona.nombres}  " />
+                        
+                        <p:commandButton value="Cerrar Sesión" actionListener="#{bUsuario.salirSistema()}"
+                                         icon="ui-icon-extlink" />
+                    </f:facet>
+                </p:menubar>
+            </h:form>
+        </ui:composition>
+    </h:body>
+</html>

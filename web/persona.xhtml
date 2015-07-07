@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html  xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"  >
+<h:head>
+</h:head>
+<h:body>
+  <ui:composition template="/WEB-INF/facelets/templates/template_pagina.xhtml">
+      <ui:define name="contenido">
+          <h:outputText value="No tiene acceso a este contenido" class="titulo"  rendered="#{bUsuario.getPermisos('1') eq '0'}" />
+          <p:panel id="encabezado" style="text-align: center"  rendered="#{bUsuario.getPermisos('1') ne '0'}">
+              <h:outputText value="#{msg.persona}" class="titulo" />
+          </p:panel>
+          <p:tabView id="PersonaTabView" dynamic="true" orientation="top" activeIndex="#{bPersona.activeTabIndex}" 
+                       rendered="#{bUsuario.getPermisos('1') ne '0'}">
+              <p:tab id="tab_registrar" title="#{msg.registrar}">
+             <h:form id="form_reg_persona">
+                 <p:growl globalOnly="true"  id="estRegPersona" sticky="false"  showDetail="true"  /> 
+                 <p:panel id="panel" header="#{msg.registrar}" style="font-family: sans-serif" styleClass="border">  
+                     
+                     <h:panelGrid columns="2"> 
+                         
+                         <h:outputText value="#{msg.apPat} #{msg.requerido}" />
+                         <h:panelGroup>
+                             <p:inputText id="apellido_p" required="true" requiredMessage="#{msg.requerido}"
+                                          value="#{bPersona.objPersonaReg.ap_pat}"
+                                maxlength="150"  validatorMessage="#{msg.noValido}" 
+                                title="#{msg.apPat} #{msg.requerido}">  
+                                 <f:validateLength minimum="2"  maximum="50" /> 
+                                 <f:validateRegex pattern="^[a-zA-ZñáéíóúÑÁÉÍÓÚ| ]*$"/>
+                             </p:inputText>
+                             <h:message for="apellido_p" showDetail="false" showSummary="true"/>                                         
+                        </h:panelGroup>
+                         
+                         <h:outputText value="#{msg.apMat} #{msg.requerido}" />
+                         <h:panelGroup>
+                             <p:inputText id="apellido_m" required="true" requiredMessage="#{msg.requerido}"
+                                          value="#{bPersona.objPersonaReg.ap_mat}"
+                                maxlength="150"  validatorMessage="#{msg.noValido}" 
+                                title="#{msg.apMat} #{msg.requerido}">  
+                                 <f:validateLength minimum="2"  maximum="50" /> 
+                                 <f:validateRegex pattern="^[a-zA-ZñáéíóúÑÁÉÍÓÚ| ]*$"/>
+                             </p:inputText>
+                             <h:message for="apellido_m" showDetail="false" showSummary="true"/>                                         
+                        </h:panelGroup>
+                         
+                         <h:outputText value="#{msg.nombres} #{msg.requerido}" />
+                         <h:panelGroup>
+                             <p:inputText id="nombres" required="true" requiredMessage="#{msg.requerido}"
+                                          value="#{bPersona.objPersonaReg.nombres}"
+                                    maxlength="150"  validatorMessage="#{msg.noValido}" 
+                                    title="#{msg.nombres}">  
+                                 <f:validateLength minimum="2"  maximum="150" /> 
+                                 <f:validateRegex pattern="^[a-zA-Zñáéíóú| ]*$"/>
+                             </p:inputText>
+                             <h:message for="nombres" showDetail="false" showSummary="true"/>                                         
+                        </h:panelGroup>
+                         
+                         <h:outputText value="#{msg.correo}" />
+                         <h:panelGroup>
+                             <p:inputText id="correo" value="#{bPersona.objPersonaReg.correo}"
+                                        maxlength="50"  validatorMessage="#{msg.noValido}" 
+                                        title="#{msg.correo}">  
+                                 <f:validateLength minimum="0"  maximum="50" />  
+                                 <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                             </p:inputText>
+                             <h:message for="correo" showDetail="false" showSummary="true"/>                                         
+                        </h:panelGroup>
+                         
+                         <h:outputText value="#{msg.tipo} #{msg.requerido}" />
+                         <h:panelGroup>
+                             <p:selectOneMenu id="tipo_persona" required="true" requiredMessage="#{msg.requerido}" filter="true"
+                                              value="#{bPersona.objPersonaReg.objTipoPersona.id_tipo_persona}"
+                                             filterMatchMode="contains" effect="fade" panelStyle="width:20px"  >                                
+                                <f:selectItem itemLabel="Tipo" itemValue="" noSelectionOption="true" />
+                                <f:selectItems value="#{bTipPersona.doListarComboTipoPersona()}" var="var"  
+                                               itemLabel="#{var.nombre}" itemValue="#{var.id_tipo_persona}"/>
+                            </p:selectOneMenu>
+                             <h:message for="tipo_persona" showDetail="false" showSummary="true"/>                                         
+                        </h:panelGroup>
+                         
+                     </h:panelGrid>
+                     
+                     <h:panelGrid columns="2"  cellpadding="2"  cellspacing="6"   
+                                  styleClass="panelColumns" columnClasses="labelOT, valueOT"  >
+                        
+                         <p:commandButton   
+                             actionListener="#{bPersona.doRegistroPersona()}"  icon="ui-icon-disk"  async="true"
+                             value="#{msg.registrar}"  update="form_reg_persona, estRegPersona" global="false"/>
+                              
+                     </h:panelGrid>        
+                
+                 </p:panel> 
+             </h:form>
+                  
+             </p:tab>  
+              
+              <!-- Listar  -->
+              <p:tab id="tab_listar" title="#{msg.listar}">
+                  <h:form id="form_mostrar_listado">
+                      <p:growl globalOnly="true"  id="listar_persona" sticky="false"  showDetail="true"  />
+                      <p:panel id="datos_persona" header="Listado de Registros" styleClass="border">
+                          <h:panelGrid columns="1" cellpadding="10" >              
+                                <h:panelGroup>
+                                    <h:outputText value="Opciones de visualizacion"/>
+                                </h:panelGroup> 
+                            </h:panelGrid>
+                          <h:panelGrid columns="4" cellpadding="2"  cellspacing="2" style="text-align: center;" width="100%">
+                              <p:commandButton id="saveBtnINI" icon="ui-icon-document" actionListener="#{bPersona.doIniciarArrPersona()}"  
+                                                 value="Nuevo Listado" async="true" update="form_mostrar_listado:datos_persona"/>                                   
+                              <p:commandButton id="saveBtn" icon="ui-icon-search" actionListener="#{bPersona.doListarPersona()}"  
+                                                 value="Visualizar" async="true" update="form_mostrar_listado:datos_persona"/>     
+                            </h:panelGrid> 
+                          <p:blockUI block="datos_persona" trigger="saveBtn">                                               
+                                Generando Listado... <br />
+                                <p:graphicImage value="resources/img/cargando.gif" />   
+                            </p:blockUI>
+                          
+                          <center>  
+                          <h:panelGrid columns="1" rendered="#{bPersona.sizeRegistrosPersona  ne '0'}"> 
+                                <h:panelGroup>                                   
+                                    <h:outputText styleClass="etiqueta_resultBusq" value="Cantidad de registros: "/>
+                                    <h:outputText styleClass="etiqueta_resultBusq" 
+                                                      value="#{bPersona.sizeRegistrosPersona}"/> 
+                                </h:panelGroup>
+                            </h:panelGrid>
+                            </center>
+                          <br/>
+                          <h:panelGrid id="pn_datos" columns="1"  cellpadding="0"  cellspacing="0" border="0"  styleClass="width-table">
+                              <p:dataTable id="tbl_datos_persona" value="#{bPersona.arrPersona}" var="list_persona" 
+                                           rendered="#{bPersona.sizeRegistrosPersona ne '0'}"                                                                                      
+                                           styleClass="order-table" paginator="true" rows="10" rowsPerPageTemplate="5,10,15,20,25,30,50"
+                                           style="width: 100%"
+                                           paginatorPosition="both" paginatorAlwaysVisible="true" 
+                                           tableStyle="tablecolBusqSimpOrdTrab1,tablecolBusqSimpOrdTrab2,
+                                           tablecolBusqSimpOrdTrab3, tablecolBusqSimpOrdTrab4, 
+                                           tablecolBusqSimpOrdTrab5, tablecolBusqSimpOrdTrab6" editable="true">
+                                  
+                                  <p:ajax event="rowEdit" listener="#{bPersona.onEdit}" update="tbl_datos_persona" async="true" />  
+                                  <p:ajax event="rowEditCancel" listener="#{bPersona.onCancel}" update="tbl_datos_persona" async="true" />
+                                      
+                                  <p:column headerText="Apellidos" filterBy="#{list_persona.apellidos}" 
+                                            sortBy="#{list_persona.apellidos}">
+                                      <p:cellEditor>
+                                          <f:facet name="output">
+                                              <h:outputText value="#{list_persona.apellidos}"/>
+                                          </f:facet>
+                                          <f:facet name="input">
+                                              <h:panelGroup>
+                                                  <p:inputText id="apellidos" required="true" requiredMessage="#{msg.requerido}"
+                                                                value="#{list_persona.apellidos}"
+                                                        maxlength="150"  validatorMessage="#{msg.noValido}" >  
+                                                         <f:validateLength minimum="2"  maximum="250" /> 
+                                                         <f:validateRegex pattern="^[a-zA-ZñáéíóúÑÁÉÍÓÚ| ]*$" />
+                                                   </p:inputText>                                                  
+                                              </h:panelGroup>
+                                          </f:facet>
+                                      </p:cellEditor>
+                                      
+                                  </p:column>
+                                  
+                                  <p:column headerText="Nombres" filterBy="#{list_persona.nombres}" 
+                                            sortBy="#{list_persona.nombres}">
+                                      <p:cellEditor>
+                                          <f:facet name="output">
+                                              <h:outputText value="#{list_persona.nombres}"/>
+                                          </f:facet>
+                                          <f:facet name="input">
+                                              <h:panelGroup>
+                                                  <p:inputText id="nombres" required="true" requiredMessage="#{msg.requerido}"
+                                                                value="#{list_persona.nombres}"
+                                                        maxlength="150"  validatorMessage="#{msg.noValido}" >  
+                                                         <f:validateLength minimum="2"  maximum="250" /> 
+                                                         <f:validateRegex pattern="^[a-zA-ZñáéíóúÑÁÉÍÓÚ| ]*$"/>
+                                                   </p:inputText>                                                  
+                                              </h:panelGroup>
+                                          </f:facet>
+                                      </p:cellEditor>                                      
+                                  </p:column>
+                                  <p:column headerText="Usuario" filterBy="#{list_persona.usuario}" 
+                                            sortBy="#{list_persona.usuario}">
+                                      <h:outputText value="#{list_persona.usuario}"/>
+                                  </p:column>
+                                  <p:column headerText="Correo" filterBy="#{list_persona.correo}" 
+                                            sortBy="#{list_persona.correo}">
+                                      <p:cellEditor>
+                                          <f:facet name="output">
+                                              <h:outputText value="#{list_persona.correo}"/>
+                                          </f:facet>
+                                          <f:facet name="input">
+                                              <h:panelGroup>
+                                                  <p:inputText id="correo"
+                                                                value="#{list_persona.correo}"
+                                                        maxlength="150"  validatorMessage="#{msg.noValido}" >  
+                                                         <f:validateLength minimum="2"  maximum="50" /> 
+                                                         <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                                   </p:inputText>                                                  
+                                              </h:panelGroup>
+                                          </f:facet>
+                                      </p:cellEditor>                                      
+                                  </p:column>                                  
+                                  
+                                  <p:column headerText="Estado" filterBy="#{list_persona.estado_d}" 
+                                            sortBy="#{list_persona.estado_d}">
+                                      <p:cellEditor>
+                                          <f:facet name="output">
+                                              <h:outputText value="#{list_persona.estado_d}"/>
+                                          </f:facet>
+                                          <f:facet name="input">
+                                              <h:panelGroup>
+                                                  <p:selectOneMenu id="estados" value="#{list_persona.estado}" 
+                                                                   style="width: 220px"  required="true">
+                                                        <f:selectItem itemLabel="ACTIVO" itemValue="1" />
+                                                        <f:selectItem itemLabel="INACTIVO" itemValue="2" />                                                            
+                                                    </p:selectOneMenu>
+                                              </h:panelGroup>
+                                          </f:facet>
+                                      </p:cellEditor>                                      
+                                  </p:column>
+                                  
+                                  <p:column headerText="Tipo" filterBy="#{list_persona.objTipoPersona.nombre}" 
+                                            sortBy="#{list_persona.objTipoPersona.nombre}">
+                                      
+                                      <p:cellEditor>
+                                          <f:facet name="output">
+                                              <h:outputText value="#{list_persona.objTipoPersona.nombre}"/>
+                                          </f:facet>
+                                          <f:facet name="input">
+                                              <h:panelGroup>
+                                                  <p:selectOneMenu id="tipo_persona" required="true" requiredMessage="#{msg.requerido}" filter="true"
+                                                                   value="#{list_persona.objTipoPersona.id_tipo_persona}"
+                                                                   filterMatchMode="contains" effect="fade"   >                                
+                                                      <f:selectItem itemLabel="Tipo" itemValue="" noSelectionOption="true" />
+                                                      <f:selectItems value="#{bTipPersona.doListarComboTipoPersona()}" var="var"  
+                                                                     itemLabel="#{var.nombre}" itemValue="#{var.id_tipo_persona}"/>
+                                                  </p:selectOneMenu>
+                                              </h:panelGroup>
+                                          </f:facet>
+                                      </p:cellEditor> 
+                                      
+                                  </p:column>
+                                  <p:column headerText="Editar" width="50" exportable="false">
+                                      <p:rowEditor />
+                                  </p:column>
+                                  <p:column headerText="Ver" exportable="false" rendered="#{bUsuario.getPermisos('2') ne '0'}">                                      
+                                      <table style="text-align: center; ">
+                                          <tr>
+                                              <td>
+                                                  <p:commandLink  id="detalle" title="Funciones" value="Funciones" styleClass="boton"
+                                                                  action="#{bPersona.mostrarFunciones(list_persona)}" 
+                                                                actionListener="#{bPersona.onClickCambio}" async="true" 
+                                                                update=":PersonaTabView, :PersonaTabView:form_ver_funciones" >
+                                                    <f:attribute name="param" value="#{1}" />
+                                                </p:commandLink>
+                                              </td>
+                                          </tr>
+                                      </table>
+                                  </p:column>
+                                  
+                              </p:dataTable>
+                          </h:panelGrid>
+                      </p:panel>
+                      
+                  </h:form>
+                  
+              </p:tab>
+              
+              <!-- tab detalle de persona -->
+              <p:tab id="tab_mostrat_detalle_persona" title="Funciones" titletip="Muestra Funciones del usuario" 
+                     disabled="#{bPersona.bandVer}" rendered="#{bUsuario.getPermisos('2') ne '0'}">
+                  
+                  <h:form class="border_titulo1" id="form_reg_funciones"   style="text-align : justify;"  
+                          rendered="#{bPersona.bandFormVer}">
+                      <p:growl globalOnly="true"  id="regFuncion" sticky="false"  showDetail="true"  />
+                      <p:panel id="reg_funcion" header="Agregar función" styleClass="border">
+                          <h:panelGrid columns="3">
+                              <h:outputText value="Función: " />
+                                <h:panelGroup>
+                                    <p:selectOneMenu id="funcion" required="true" requiredMessage="#{msg.requerido}" filter="true"
+                                                     value="#{bPersona.objPerFuncion.objFuncion.id_funcion}"
+                                                    filterMatchMode="contains" effect="fade" panelStyle="width:20px"  >                                
+                                       <f:selectItem itemLabel="Función" itemValue="" noSelectionOption="true" />
+                                       <f:selectItems value="#{bFuncion.doListarComboFuncion()}" var="var"  
+                                                      itemLabel="#{var.nombre}" itemValue="#{var.id_funcion}"/>
+                                   </p:selectOneMenu>
+                                    <h:message for="funcion" showDetail="false" showSummary="true"/>                                         
+                               </h:panelGroup>
+                              <p:commandButton   
+                                  actionListener="#{bPersona.doRegistroPersonaFuncion()}"  icon="ui-icon-disk"  async="true"
+                                    value="#{msg.registrar}"  update="form_reg_funciones, regFuncion, :PersonaTabView:form_ver_funciones" global="false"/>
+                              
+                          </h:panelGrid>
+                      </p:panel>
+                  </h:form>
+                  
+                  
+                  <h:form class="border_titulo1" id="form_ver_funciones"   style="text-align : justify;"  
+                          rendered="#{bPersona.bandFormVer}">
+                      <p:growl globalOnly="true"  id="VerDatos_persona" sticky="false"  showDetail="true"  />
+                      <p:panel id="ver_detalles_persona" header="Funciones" styleClass="border">                                                    
+                          
+                          <p:fieldset legend="Funciones del sistema"  styleClass="border">
+                              
+                              <h:panelGrid columns="1"  cellpadding="0"  cellspacing="0" border="0"  styleClass="width-table">
+                                  <p:dataTable id="tbl_datos_persona" value="#{bPersona.arrPersonaFuncion}" var="list_funcion" 
+                                               rendered="#{bPersona.sizeRegistrosPersonaFuncion ne '0'}"                                                                                      
+                                                 styleClass="order-table" paginator="true" rows="10" 
+                                                 rowsPerPageTemplate="5,10,15,20,25,30,50"
+                                                 style="width: 30%" 
+                                                 paginatorPosition="both" paginatorAlwaysVisible="true" 
+                                                 tableStyle="tablecolBusqSimpOrdTrab1,tablecolBusqSimpOrdTrab2,
+                                                 tablecolBusqSimpOrdTrab3, tablecolBusqSimpOrdTrab4, 
+                                                 tablecolBusqSimpOrdTrab5, tablecolBusqSimpOrdTrab6"
+                                                 editable="true">
+                                      
+                                      <p:ajax event="rowEdit" listener="#{bPersona.onEditFuncion}" update="tbl_datos_persona" async="false" />  
+                                      <p:ajax event="rowEditCancel" listener="#{bPersona.onCancelFuncion}" update="tbl_datos_persona" async="false"  />
+                                      
+                                       <p:column headerText="Función" >
+                                           <p:cellEditor>
+                                               <f:facet name="output">
+                                                   <h:outputText value="#{list_funcion.objFuncion.nombre}"/>
+                                               </f:facet>
+                                               <f:facet name="input">
+                                                   <h:panelGroup>
+                                                       <p:selectOneMenu id="estado" value="#{list_funcion.estado}" style="width: 100%"   required="true">
+                                                            <f:selectItem itemLabel="ACTIVO" itemValue="1" />
+                                                            <f:selectItem itemLabel="INACTIVO" itemValue="2" />                                                            
+                                                        </p:selectOneMenu>
+                                                  </h:panelGroup>
+                                               </f:facet>
+                                            </p:cellEditor>
+                                        </p:column>
+                                      <p:column headerText="Opcion" width="130" style="text-align: center;">  
+                                                <p:rowEditor style="width: 50px"  />
+                                          </p:column> 
+
+                                    </p:dataTable>
+                                </h:panelGrid>
+                              
+                          </p:fieldset>
+                          
+                          <h:panelGrid columns="1" cellpadding="4"  cellspacing="4" style="text-align: center;" width="100%">
+                              <h:panelGroup>
+                                  <h:panelGrid columns="1" cellpadding="2"  cellspacing="2" style="text-align: center;" width="100%">
+                                      <p:commandButton icon="ui-icon-triangle-1-w" actionListener="#{bPersona.desactivaTabVer()}"  
+                                                       value="Volver" immediate="true" async="true" 
+                                                       update=":PersonaTabView, :PersonaTabView:form_mostrar_listado"/>
+                                  </h:panelGrid>
+                              </h:panelGroup>
+                          </h:panelGrid>
+                      </p:panel>
+                  </h:form>
+              </p:tab>
+       
+          </p:tabView>
+          
+       </ui:define>
+   </ui:composition>
+        
+</h:body>
+</html>

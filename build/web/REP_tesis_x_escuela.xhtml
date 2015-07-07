@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+    </h:head>
+    <h:body>
+        <ui:composition template="/WEB-INF/facelets/templates/template_pagina.xhtml">
+            <ui:define name="contenido">
+                <h:outputText value="No tiene acceso a este contenido" class="titulo"  rendered="#{bUsuario.getPermisos('2') eq '0'}" />
+                <p:panel id="encabezado" style="text-align: center"  rendered="#{bUsuario.getPermisos('2') ne '0'}">
+                    <h:outputText value="Nro de tesis por escuela" class="titulo" />
+                </p:panel>
+                <center>
+                <p:panel rendered="#{bUsuario.getPermisos('2') ne '0'}" >
+                    
+                    
+                        <p:panel id="reportPie" header="Nro de tesis por escuela"  
+                                 visible="true" widgetVar="reportPie"
+                                 closable="true" toggleable="true">                            
+                            
+                                
+                                <p:chart type="pie" model="#{bChart.pieChartEscuelasTesis}" style="width:700px;height:500px" widgetVar="chart"/>
+             
+                                <p:commandButton type="button" value="Guardar como imagen" icon="ui-icon-extlink" onclick="exportChart()"/>
+
+                                <p:dialog widgetVar="dlg" showEffect="fade" modal="false" header="Guardar como imagen" resizable="true">
+                                    <p:outputPanel id="output" layout="block" style="width:700px;height:500px"/>
+                                </p:dialog>
+
+                                <script type="text/javascript">
+                                function exportChart() {
+                                    //export image
+                                    $('#output').empty().append(PF('chart').exportAsImage());
+
+                                    //show the dialog
+                                    PF('dlg').show();
+                                }
+                                </script>
+                                
+                            
+                        </p:panel>
+                    
+                    
+                </p:panel>
+                </center>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

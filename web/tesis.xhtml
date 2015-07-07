@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html  xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"  >
+<h:head>
+</h:head>
+<h:body >
+  <ui:composition template="/WEB-INF/facelets/templates/template_pagina.xhtml">
+      <ui:define name="contenido">
+          <h:outputText value="No tiene acceso a este contenido" class="titulo"  rendered="#{bUsuario.getPermisos('1') eq '0'}" />
+          <p:panel id="encabezado" style="text-align: center" rendered="#{bUsuario.getPermisos('1') ne '0'}">
+              <h:outputText value="#{msg.tesis}" class="titulo" />
+          </p:panel>
+          <p:tabView id="TesisTabView" dynamic="true" orientation="top" activeIndex="#{bTesis.activeTabIndex}" 
+                      rendered="#{bUsuario.getPermisos('1') ne '0'}">
+              <p:tab id="tab_registrar" title="#{msg.registrar}">
+             <h:form id="form_reg_tesis">
+                 <p:growl globalOnly="true"  id="estRegTesis" sticky="false"  showDetail="true"  /> 
+                 <p:panel id="panel" header="#{msg.registrar} #{msg.tesis}" style="font-family: sans-serif" styleClass="border">  
+                     
+                     <p:focus context="panel"/>
+                     <h:panelGrid columns="2"> 
+                         
+                         <h:outputText value="#{msg.autor} #{msg.requerido}" />
+                         <h:panelGroup>
+                             <p:selectOneMenu id="autor" required="true" requiredMessage="#{msg.requerido}" filter="true"
+                                              value="#{bTesis.objTesisReg.objAutor.id_persona}"
+                                              filterMatchMode="contains" effect="fade" panelStyle="width:20px" style="width:250px" >                                
+                                <f:selectItem itemLabel="Autor" itemValue="" noSelectionOption="true" />
+                                <f:selectItems value="#{bPersona.doListarComboPersona(5)}" var="var"  
+                                               itemLabel="#{var.apellidos}" itemValue="#{var.id_persona}"/>
+                                
+                            </p:selectOneMenu>
+                            <h:message for="autor" showDetail="false" showSummary="true" styleClass="errors"/>
+                        </h:panelGroup>
+                         
+                         <h:outputText value="#{msg.director} #{msg.requerido}" />
+                         <h:panelGroup>
+                             <p:selectOneMenu id="director" required="true" requiredMessage="#{msg.requerido}" filter="true"
+                                              value="#{bTesis.objTesisReg.id_director}"
+                                              filterMatchMode="contains" effect="fade" panelStyle="width:20px" style="width:250px" >                                
+                                <f:selectItem itemLabel="Director" itemValue="" noSelectionOption="true" />
+                                <f:selectItems value="#{bPersona.doListarComboPersona(3)}" var="var"  
+                                               itemLabel="#{var.apellidos}" itemValue="#{var.id_persona}"/>
+                            </p:selectOneMenu>
+                            <h:message for="director" showDetail="false" showSummary="true" styleClass="errors"/>
+                        </h:panelGroup>
+                         
+                         <h:outputText value="#{msg.escuela} #{msg.requerido}" />
+                         <h:panelGroup>
+                             <p:selectOneMenu id="escuela" required="true" requiredMessage="#{msg.requerido}" filter="true"
+                                              value="#{bLineaInv.objLinInvestBusca.objEscuela.id_escuela}"
+                                              filterMatchMode="contains" effect="fade" panelStyle="width:20px" style="width:250px" > 
+                                 <p:ajax listener="#{bLineaInv.doListarComboLineaEscuela()}" update="linea" />
+                                <f:selectItem itemLabel="Escuela" itemValue="" noSelectionOption="true" />
+                                <f:selectItems value="#{bEscuela.doListarComboEscuela()}" var="var"  
+                                               itemLabel="#{var.nombre}" itemValue="#{var.id_escuela}"/>
+                            </p:selectOneMenu>
+                            <h:message for="escuela" showDetail="false" showSummary="true" styleClass="errors"/>
+                        </h:panelGroup>
+                         
+                         <h:outputText value="#{msg.lineaInv} #{msg.requerido}" />
+                         <h:panelGroup>
+                             <p:selectOneMenu id="linea" required="true" requiredMessage="#{msg.requerido}" filter="true"
+                                              value="#{bTesis.objTesisReg.objLinea.id_linea}"
+                                              filterMatchMode="contains" effect="fade" panelStyle="width:20px" style="width:250px" >                                
+                                <f:selectItem itemLabel="Linea" itemValue="" noSelectionOption="true" />
+                                <f:selectItems value="#{bLineaInv.doListarComboLineaEscuela()}" var="var"  
+                                               itemLabel="#{var.nombre}" itemValue="#{var.id_linea}"/>
+                            </p:selectOneMenu>
+                            <h:message for="linea" showDetail="false" showSummary="true" styleClass="errors"/>
+                        </h:panelGroup>
+                         
+                         <h:outputText value="#{msg.esquemaTesis} #{msg.requerido}" />
+                         <h:panelGroup>
+                             <p:selectOneMenu id="esquema" required="true" requiredMessage="#{msg.requerido}" filter="true"
+                                              value="#{bTesis.objTesisReg.objEsquema.id_esquema}"
+                                              filterMatchMode="contains" effect="fade" panelStyle="width:20px" style="width:250px" >                                
+                                <f:selectItem itemLabel="Esquema" itemValue="" noSelectionOption="true" />
+                                <f:selectItems value="#{bEsquemaT.doListarComboEsquemaTesis()}" var="var"  
+                                               itemLabel="#{var.descripcion}" itemValue="#{var.id_esquema}"/>
+                            </p:selectOneMenu>
+                            <h:message for="esquema" showDetail="false" showSummary="true" styleClass="errors"/>
+                        </h:panelGroup>
+                         
+                         <h:outputText value="#{msg.tituloTesis} #{msg.requerido}" />
+                         <h:panelGroup>
+                             <p:inputTextarea id="titulo" value="#{bTesis.objTesisReg.titulo}" 
+                                              rows="5" cols="40" maxlength="500" required="true" 
+                                              requiredMessage="#{msg.requerido}" title="#{msg.tituloTesis}"
+                                              autoResize="false" />                             
+                             <h:message for="titulo" showDetail="false" showSummary="true"/>                                         
+                        </h:panelGroup>
+                         
+                         <h:outputText  value="#{msg.fechaSust} #{msg.requerido}"  style="width:350px;"/>
+                         <h:panelGroup>
+                             <p:calendar  id="fecha_sust" pattern="dd/MM/yyyy" mindate="1-12-1960" maxdate="today"
+                                         required="true" requiredMessage="#{msg.requerido}" 
+                                         value="#{bTesis.objTesisReg.fecha_sustentacion}"  locale="es" 
+                                         showButtonPanel="true" navigator="true" style="width: 150px;">
+                             </p:calendar>
+                             <h:message for="fecha_sust" showDetail="false" showSummary="true" styleClass="errors"/>
+                         </h:panelGroup>                         
+                         
+                     </h:panelGrid>
+                     
+                     <h:panelGrid columns="2"  cellpadding="2"  cellspacing="6"   
+                                  styleClass="panelColumns" columnClasses="labelOT, valueOT"  >
+                        
+                         <p:commandButton   
+                              icon="ui-icon-disk"  async="true"
+                              value="#{msg.registrar}" actionListener="#{bTesis.doRegistroTesis()}"  update="form_reg_tesis, estRegTesis" global="false"/>
+                              
+                     </h:panelGrid>        
+                
+                 </p:panel> 
+             </h:form>
+                  
+             </p:tab>  
+              
+              <!-- Buscar  -->
+              <!-- p:tab id="tab_buscar" title="# {msg.registrar}">
+              </p:tab -->
+              
+              <!-- Listar  -->
+              <p:tab id="tab_listar" title="#{msg.listar}">
+                  <h:form id="form_mostrar_listado">
+                      <p:panel id="datos_tesis" header="Listado de tesis" styleClass="border">
+                          <h:panelGrid columns="1" cellpadding="10" >              
+                                <h:panelGroup>
+                                    <h:outputText value="Opciones de visualizacion"/>
+                                </h:panelGroup> 
+                            </h:panelGrid>
+                          <h:panelGrid columns="4" cellpadding="2"  cellspacing="2" style="text-align: center;" width="100%">
+                              <p:commandButton id="saveBtnINI" icon="ui-icon-document" actionListener="#{bTesis.doIniciarArrTesisRecepcion()}"  
+                                                 value="Nuevo Listado" async="true" update="form_mostrar_listado:datos_tesis"/>                                   
+                              <p:commandButton id="saveBtn" icon="ui-icon-search" actionListener="#{bTesis.doListarTesis()}"  
+                                                 value="Visualizar" async="true" update="form_mostrar_listado:datos_tesis"/>     
+                            </h:panelGrid> 
+                          <p:blockUI block="datos_tesis" trigger="saveBtn">                                               
+                                Generando Listado... <br />
+                                <p:graphicImage value="resources/img/cargando.gif" />   
+                            </p:blockUI>
+                          
+                          <center>  
+                          <h:panelGrid columns="1" rendered="#{bTesis.sizeRegistrosTesis  ne '0'}"> 
+                                <h:panelGroup>                                   
+                                    <h:outputText styleClass="etiqueta_resultBusq" value="Cantidad de registros: "/>
+                                    <h:outputText styleClass="etiqueta_resultBusq" 
+                                                      value="#{bTesis.sizeRegistrosTesis}"/> 
+                                </h:panelGroup>
+                            </h:panelGrid>
+                            </center>
+                          <br/>
+                          <h:panelGrid columns="1"  cellpadding="0"  cellspacing="0" border="0"  styleClass="width-table">
+                              <p:dataTable id="tbl_datos_tesis" value="#{bTesis.arrTesisRecepcion}" var="list_tesis" 
+                                           rendered="#{bTesis.sizeRegistrosTesis ne '0'}"                                                                                      
+                                           styleClass="order-table" paginator="true" rows="10" rowsPerPageTemplate="5,10,15,20,25,30,50"
+                                           style="width: 100%"
+                                           paginatorPosition="both" paginatorAlwaysVisible="true" 
+                                           tableStyle="tablecolBusqSimpOrdTrab1,tablecolBusqSimpOrdTrab2,
+                                           tablecolBusqSimpOrdTrab3, tablecolBusqSimpOrdTrab4, 
+                                           tablecolBusqSimpOrdTrab5, tablecolBusqSimpOrdTrab6">
+                                  
+                                  <p:column headerText="Titulo" filterBy="#{list_tesis.objTesis.titulo}" sortBy="#{list_tesis.objTesis.titulo}">
+                                      <h:outputText value="#{list_tesis.objTesis.titulo}"/>
+                                  </p:column>
+                                  
+                                  <p:column headerText="Autor" filterBy="#{list_tesis.objTesis.objAutor.apellidos}" 
+                                            sortBy="#{list_tesis.objTesis.objAutor.apellidos}">
+                                      <h:outputText value="#{list_tesis.objTesis.objAutor.apellidos}"/>
+                                  </p:column>
+                                  
+                                  <p:column headerText="Escuela" filterBy="#{list_tesis.objTesis.objLinea.objEscuela.nombre}" 
+                                            sortBy="#{list_tesis.objTesis.objLinea.objEscuela.nombre}">
+                                      <h:outputText value="#{list_tesis.objTesis.objLinea.objEscuela.nombre}"/>
+                                  </p:column>                                  
+                                  
+                                  <p:column headerText="Esquema" filterBy="#{list_tesis.objTesis.objEsquema.descripcion}" 
+                                            sortBy="#{list_tesis.objTesis.objEsquema.descripcion}">
+                                      <h:outputText value="#{list_tesis.objTesis.objEsquema.descripcion}"/>
+                                  </p:column>
+                                  
+                                  <p:column headerText="Estado" >
+                                      <h:outputText value="#{list_tesis.desEstado}"/>
+                                  </p:column>
+                                  
+                                  <!-- p:column headerText="Registrada" width="100" >
+                                      <h:outputText value="# {list_tesis.objTesis.fecha_registro}"/>
+                                  </p:column -->
+                                  
+                                  <p:column headerText="Opciones" exportable="false">
+                                      <table style="text-align: center; ">
+                                          <tr >
+                                              <td>
+                                                  <p:commandLink  id="detalle" title="Detalle" value="Detalle" styleClass="boton"
+                                                                action="#{bTesis.mostrarDetalleTesis(list_tesis)}" 
+                                                                actionListener="#{bTesis.onClickCambio}" async="true" 
+                                                                update=":TesisTabView, :TesisTabView:form_ver_detalle_tesis" >
+                                                    <f:attribute name="param" value="#{1}" />
+                                                </p:commandLink>
+                                              </td>
+                                          </tr>
+                                          <tr>
+                                              <td>
+                                                  <!--p:commandLink  id="recepcion" title="Nuevo Ingreso" value="Recepcionar" styleClass="boton"
+                                                                action="# {bTesis.mostrarDetalleTesis(list_tesis)}" 
+                                                                actionListener="# {bTesis.onClickCambio}" async="true" 
+                                                                update=":TesisTabView, :TesisTabView:form_ver_detalle_tesis" >
+                                                    <f:attribute name="param" value="# {1}" />
+                                                </p:commandLink-->
+                                                  
+                                                  <p:commandButton rendered="#{list_tesis.estado ne 5}" update=":TesisTabView:form_recepcionar" styleClass="boton" value="Recepcionar" 
+                                                                    oncomplete="PF('recepTesis').show()" async="true"
+                                                                    icon="fa-mail-forward" title="Recepcionar" action="#{bTesis.doRecepcionFinalizada(list_tesis.objTesis.id_tesis)}" >
+                                                      <f:setPropertyActionListener value="#{list_tesis}" target="#{bTesis.selectTesisRecepcion}" />
+                                                  </p:commandButton>
+                                                  
+                                                  
+                                              </td>
+                                          </tr>
+                                      </table>
+                                  </p:column>
+                                  
+                              </p:dataTable>
+                          </h:panelGrid>
+                      </p:panel>
+                      
+                  </h:form>
+                  
+                  <!-- nueva recepcion de tesis -->
+                  <h:form id="form_recepcionar">
+                    <p:dialog header="Recepcion de Tesis" widgetVar="recepTesis" resizable="false" 
+                              id="recepTesis" showEffect="fade" hideEffect="explode" modal="false"
+                              width="40%">                        
+                        <p:panel id="popRecep" style="width: 100%" rendered="#{bTesis.sizeRegistrosRecepFin}" >
+                            <p:growl globalOnly="true"  id="estRegRecepcion" sticky="false"  showDetail="true"  /> 
+                            <center>
+                            <h:panelGrid columns="1" cellpadding="4" style="text-align: center; width: 100%">
+                                <p:graphicImage value="resources/img/recepcion.png" width="70"  />   
+                                <h:outputText value="Tesis: " style="font-weight: bold;" />
+                                <h:outputText value="#{bTesis.selectTesisRecepcion.objTesis.titulo}" />
+                                <h:outputText value="Autor: " style="font-weight: bold;" />
+                                <h:outputText value="#{bTesis.selectTesisRecepcion.objTesis.objAutor.apellidos}" />
+                                 <h:outputText value="Escuela: " style="font-weight: bold;" />
+                                 <h:outputText value="#{bTesis.selectTesisRecepcion.objTesis.objLinea.objEscuela.nombre}" />
+                                <h:outputText value="Director: " style="font-weight: bold;" />
+                                <h:panelGroup>
+                                    <p:selectOneMenu id="director" required="true" requiredMessage="#{msg.requerido}" filter="true"
+                                                     value="#{bTesis.objTesisRecepReg.objDirector.id_persona}"
+                                                     filterMatchMode="contains" effect="fade" panelStyle="width:20px" style="width:250px" >                                
+                                       <f:selectItem itemLabel="Director" itemValue="" noSelectionOption="true" />
+                                       <f:selectItems value="#{bPersona.doListarComboPersona(3)}" var="var"  
+                                                      itemLabel="#{var.apellidos}" itemValue="#{var.id_persona}"/>
+                                   </p:selectOneMenu>
+                                   <h:message for="director" showDetail="false" showSummary="true" styleClass="errors"/>
+                               </h:panelGroup>                                
+                                <p:commandButton  value="Recepcionar" async="true"
+                                                  actionListener="#{bTesis.doRegistroTesisRecepcion()}"
+                                                  update="estRegRecepcion,recepTesis,TesisTabView:form_mostrar_listado"
+                                                  oncomplete="recepTesis.hide()"/>
+                            </h:panelGrid>
+                            </center>
+                        </p:panel>
+                        <center>
+                            <p:graphicImage rendered="#{!bTesis.sizeRegistrosRecepFin}"  value="resources/img/stop.jpeg" width="70"  />   <br/>
+                            <h:outputText rendered="#{!bTesis.sizeRegistrosRecepFin}"   value="Aún no se ha finalizado la revisión anterior." />
+                        </center>
+                        
+                        
+                    </p:dialog>
+                </h:form>
+                  
+              </p:tab>
+              
+              <!-- tab detalle de tesis -->
+              <p:tab id="tab_mostrar_detalle_tesis" title="Detalle" titletip="Muestra el detalle de las tesis" 
+                     disabled="#{bTesis.bandVer}">
+                  <h:form class="border_titulo1" id="form_ver_detalle_tesis"   style="text-align : justify;"  
+                          rendered="#{bTesis.bandFormVer}">
+                      <p:growl globalOnly="true"  id="VerDatos_apoderado_gcl" sticky="false"  showDetail="true"  />
+                      <p:panel id="ver_detalles_tesis" header="Datos de la tesis" styleClass="border">
+                          <p:fieldset legend="Datos de la tesis"  styleClass="border">
+                              <h:panelGrid columns="2"  cellpadding="2"  cellspacing="6"   
+                                           styleClass="panelColumns" columnClasses="labelOT, valueOT"  >
+                                  <h:outputText value="Titulo:" style="width: 40%; font-weight: bold" />  
+                                  <h:outputText value="#{bTesis.objTesisRecepDetalle.objTesis.titulo}" style="width: 59%" />
+                                  <h:outputText value="Autor:" style="width: 40%; font-weight: bold" />
+                                  <h:outputText value="#{bTesis.objTesisRecepDetalle.objTesis.objAutor.apellidos}" />
+                                  <h:outputText value="Recepcionista:" style="width: 40%; font-weight: bold" />
+                                  <h:outputText value="#{bTesis.objTesisRecepDetalle.objRecepcionista.apellidos}" />                                  
+                                  <h:outputText value="Fecha de registro:" style="width: 40%; font-weight: bold" />
+                                  <h:outputText value="#{bTesis.objTesisRecepDetalle.objTesis.fecha_registro}" />
+                                  <h:outputText value="Escuela:" style="width: 40%; font-weight: bold" />
+                                  <h:outputText value="#{bTesis.objTesisRecepDetalle.objTesis.objLinea.objEscuela.nombre}" />
+                                  <h:outputText value="Línea de Investigación:" style="width: 40%; font-weight: bold" />
+                                  <h:outputText value="#{bTesis.objTesisRecepDetalle.objTesis.objLinea.nombre}" />
+                                  <h:outputText value="Esquema de Tesis:" style="width: 40%; font-weight: bold" />
+                                  <h:outputText value="#{bTesis.objTesisRecepDetalle.objTesis.objEsquema.descripcion}" />
+                                  <h:outputText value="Fecha de Sustentación" style="width: 40%; font-weight: bold" />
+                                  <h:outputText value="#{bTesis.objTesisRecepDetalle.objTesis.fecha_sustentacion}" />
+                              </h:panelGrid>
+                          </p:fieldset>
+                          
+                          <h:panelGrid columns="1" cellpadding="4"  cellspacing="4" style="text-align: center;" width="100%">
+                              <h:panelGroup>
+                                  <h:panelGrid columns="1" cellpadding="2"  cellspacing="2" style="text-align: center;" width="100%">
+                                      <p:commandButton icon="ui-icon-triangle-1-w" actionListener="#{bTesis.desactivaTabVer()}"  
+                                                       value="Volver" immediate="true" async="true" 
+                                                       update=":TesisTabView, :TesisTabView:form_mostrar_listado"/>
+                                  </h:panelGrid>
+                              </h:panelGroup>
+                          </h:panelGrid>
+                      </p:panel>
+                  </h:form>
+              </p:tab>
+       
+          </p:tabView>
+          
+       </ui:define>
+   </ui:composition>
+        
+</h:body>
+</html>

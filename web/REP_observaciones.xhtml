@@ -1,0 +1,170 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        
+    </h:head>
+    <h:body>
+        <ui:composition template="/WEB-INF/facelets/templates/template_pagina.xhtml">
+            <ui:define name="contenido">
+                <h:outputText value="No tiene acceso a este contenido" class="titulo"  rendered="#{bUsuario.getPermisos('2') eq '0'}" />
+                <p:panel id="encabezado" style="text-align: center"  rendered="#{bUsuario.getPermisos('2') ne '0'}">
+                    <h:outputText value="Listado de observaciones de las tesis" class="titulo" />
+                </p:panel>
+                
+                <p:tabView id="TesisTabView" dynamic="true" orientation="top" activeIndex="#{bObservacion.activeTabIndex}" 
+                           rendered="#{bUsuario.getPermisos('2') ne '0'}">
+                    
+                    <p:tab id="tab_listar" title="Tesis Registradas">
+                        
+                        <h:form id="form_mostrar_listado">
+                            <p:panel id="datos_tesis" header="Listado de tesis" styleClass="border">
+                                <h:panelGrid columns="1" cellpadding="10" >              
+                                        <h:panelGroup>
+                                            <h:outputText value="Opciones de visualizacion"/>
+                                        </h:panelGroup> 
+                                    </h:panelGrid>
+                                  <h:panelGrid columns="4" cellpadding="2"  cellspacing="2" style="text-align: center;" width="100%">
+                                      <p:commandButton id="saveBtnINI" icon="ui-icon-document" actionListener="#{bTesis.doIniciarArrTesisRecepcion()}"  
+                                                         value="Nuevo Listado" async="true" update="form_mostrar_listado:datos_tesis"/>                                   
+                                      <p:commandButton id="saveBtn" icon="ui-icon-search" actionListener="#{bTesis.doListarTesis()}"  
+                                                         value="Visualizar" async="true" update="form_mostrar_listado:datos_tesis"/>     
+                                    </h:panelGrid> 
+                                  <p:blockUI block="datos_tesis" trigger="saveBtn">                                               
+                                        Generando Listado... <br />
+                                        <p:graphicImage value="resources/img/cargando.gif" />   
+                                    </p:blockUI>
+
+                                  <center>  
+                                  <h:panelGrid columns="1" rendered="#{bTesis.sizeRegistrosTesis  ne '0'}"> 
+                                        <h:panelGroup>                                   
+                                            <h:outputText styleClass="etiqueta_resultBusq" value="Cantidad de registros: "/>
+                                            <h:outputText styleClass="etiqueta_resultBusq" 
+                                                              value="#{bTesis.sizeRegistrosTesis}"/> 
+                                        </h:panelGroup>
+                                    </h:panelGrid>
+                                    </center>
+                                  <br/>
+                                  <h:panelGrid columns="1"  cellpadding="0"  cellspacing="0" border="0"  styleClass="width-table">
+                                      <p:dataTable id="tbl_datos_tesis" value="#{bTesis.arrTesisRecepcion}" var="list_tesis" 
+                                                   rendered="#{bTesis.sizeRegistrosTesis ne '0'}"                                                                                      
+                                                   styleClass="order-table" paginator="true" rows="10" rowsPerPageTemplate="5,10,15,20,25,30,50"
+                                                   style="width: 100%"
+                                                   paginatorPosition="both" paginatorAlwaysVisible="true" 
+                                                   tableStyle="tablecolBusqSimpOrdTrab1,tablecolBusqSimpOrdTrab2,
+                                                   tablecolBusqSimpOrdTrab3, tablecolBusqSimpOrdTrab4, 
+                                                   tablecolBusqSimpOrdTrab5, tablecolBusqSimpOrdTrab6">
+
+                                          <p:column headerText="Titulo" filterBy="#{list_tesis.objTesis.titulo}" sortBy="#{list_tesis.objTesis.titulo}">
+                                              <h:outputText value="#{list_tesis.objTesis.titulo}"/>
+                                          </p:column>
+
+                                          <p:column headerText="Autor" filterBy="#{list_tesis.objTesis.objAutor.apellidos}" 
+                                                    sortBy="#{list_tesis.objTesis.objAutor.apellidos}">
+                                              <h:outputText value="#{list_tesis.objTesis.objAutor.apellidos}"/>
+                                          </p:column>
+
+                                          <p:column headerText="Escuela" filterBy="#{list_tesis.objTesis.objLinea.objEscuela.nombre}" 
+                                                    sortBy="#{list_tesis.objTesis.objLinea.objEscuela.nombre}">
+                                              <h:outputText value="#{list_tesis.objTesis.objLinea.objEscuela.nombre}"/>
+                                          </p:column>                                  
+
+                                          <p:column headerText="Esquema" filterBy="#{list_tesis.objTesis.objEsquema.descripcion}" 
+                                                    sortBy="#{list_tesis.objTesis.objEsquema.descripcion}">
+                                              <h:outputText value="#{list_tesis.objTesis.objEsquema.descripcion}"/>
+                                          </p:column>
+
+                                          <p:column headerText="Estado" >
+                                              <h:outputText value="#{list_tesis.desEstado}"/>
+                                          </p:column>
+                                          
+                                          <p:column headerText="Opciones" exportable="false">
+                                              <table style="text-align: center; ">
+                                                  <tr >
+                                                      <td>
+                                                          <p:commandLink  id="detalle" title="Observaciones" value="Observaciones" styleClass="boton"
+                                                                          action="#{bObservacion.mostrarObservaciones(list_tesis.objTesis.id_tesis)}" 
+                                                                          actionListener="#{bObservacion.onClickCambio}" async="true" 
+                                                                        update=":TesisTabView, :TesisTabView:form_ver_detalle_tesis" >
+                                                            <f:attribute name="param" value="#{1}" />
+                                                        </p:commandLink>
+                                                      </td>
+                                                  </tr>
+                                              </table>
+                                          </p:column>
+
+                                      </p:dataTable>
+                                  </h:panelGrid>
+                            </p:panel>
+                        </h:form>
+                        
+                    </p:tab>
+                    
+                    <p:tab id="tab_mostrar_detalle_tesis" title="Observaciones" titletip="Muestra las observaciones de las tesis" 
+                           disabled="#{bObservacion.bandVer}">
+                        
+                        <h:form class="border_titulo1" id="form_ver_detalle_tesis"   style="text-align : justify;"  
+                                rendered="#{bObservacion.bandFormVer}">
+                            
+                            <p:growl globalOnly="true"  id="VerDatos_observacion" sticky="false"  showDetail="true"  />
+                            <p:panel id="ver_detalles_tesis" header="Observaciones" styleClass="border">
+                                <p:fieldset legend="Esquema de tesis"  styleClass="border">
+                                    
+                                    <h:panelGrid columns="1"  cellpadding="0"  cellspacing="0" border="0"  styleClass="width-table">
+                                        <p:dataTable id="tbl_datos_tesis" value="#{bObservacion.arrObservacion}" var="obs" 
+                                                     rendered="#{bObservacion.sizeRegistrosObservacion ne '0'}"                                                                                      
+                                                   styleClass="order-table" paginator="true" rows="10" rowsPerPageTemplate="5,10,15,20,25,30,50"
+                                                   style="width: 100%"
+                                                   paginatorPosition="both" paginatorAlwaysVisible="true" 
+                                                   tableStyle="tablecolBusqSimpOrdTrab1,tablecolBusqSimpOrdTrab2,
+                                                   tablecolBusqSimpOrdTrab3, tablecolBusqSimpOrdTrab4, 
+                                                   tablecolBusqSimpOrdTrab5, tablecolBusqSimpOrdTrab6">
+
+                                            <p:column headerText="Fecha">
+                                                <h:outputText value="#{obs.objRevision.objAsignacion.objTesisRecpcion.fecha_recepcion}"/>
+                                            </p:column>
+                                            <p:column headerText="Ítem" >
+                                                <h:outputText value="#{obs.objDetalleEsquema.nombre}"/>
+                                            </p:column>
+                                            <p:column headerText="Observación" >
+                                                <h:outputText value="#{obs.observacion}"/>
+                                            </p:column>
+                                            <p:column headerText="Estado" >
+                                                <h:outputText value="#{obs.estado_d}"/>
+                                            </p:column>
+
+                                        </p:dataTable>
+                                    </h:panelGrid>
+                                    
+                                </p:fieldset>
+                                
+                                <h:panelGrid columns="1" cellpadding="4"  cellspacing="4" style="text-align: center;" width="100%">
+                                    <h:panelGroup>
+                                        <h:panelGrid columns="1" cellpadding="2"  cellspacing="2" style="text-align: center;" width="100%">
+                                            <p:commandButton icon="ui-icon-triangle-1-w" actionListener="#{bObservacion.desactivaTabVer()}"  
+                                                             value="Volver" immediate="true" async="true" 
+                                                             update=":TesisTabView, :TesisTabView:form_mostrar_listado"/>
+                                        </h:panelGrid>
+                                    </h:panelGroup>
+                                </h:panelGrid>
+                                
+                            </p:panel>
+                            
+                        </h:form>
+                        
+                    </p:tab>
+                    
+                </p:tabView>
+                
+                
+                
+                
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html  xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"  >
+<h:head>
+</h:head>
+<h:body>
+  <ui:composition template="/WEB-INF/facelets/templates/template_pagina.xhtml">
+      <ui:define name="contenido">
+          <h:outputText value="No tiene acceso a este contenido" class="titulo"  rendered="#{bUsuario.getPermisos('1') eq '0'}" />
+          <p:panel id="encabezado" style="text-align: center"   rendered="#{bUsuario.getPermisos('1') ne '0'}">
+              <h:outputText value="#{msg.asignacion}" class="titulo" />
+          </p:panel>
+          <p:tabView id="AsignacionTabView" dynamic="true" orientation="top" activeIndex="#{bAsignacion.activeTabIndex}" 
+                       rendered="#{bUsuario.getPermisos('1') ne '0'}">
+              
+              <!-- Asignar Tesis a revisor  -->
+              <p:tab id="tab_asignar" title="#{msg.asignar}">
+                  <h:form id="form_mostrar_listado">
+                      <p:panel id="datos_tesis" header="Listado de tesis Pendientes de Asignación" styleClass="border">                          
+                          <h:panelGrid columns="4" cellpadding="2"  cellspacing="2" style="text-align: center;" width="100%">
+                              
+                              <p:commandButton id="saveBtn" icon="ui-icon-search" actionListener="#{bAsignacion.doListarTesis()}"  
+                                                 value="Actualizar" async="true" update="form_mostrar_listado:datos_tesis"/>     
+                            </h:panelGrid> 
+                          <p:blockUI block="datos_tesis" trigger="saveBtn">                                               
+                                Generando Listado... <br />
+                                <p:graphicImage value="resources/img/cargando.gif" />   
+                            </p:blockUI>
+                          
+                          <center>  
+                              <h:panelGrid columns="1" rendered="#{bAsignacion.sizeRegistrosTesis  ne '0'}"> 
+                                <h:panelGroup>                                   
+                                    <h:outputText styleClass="etiqueta_resultBusq" value="Cantidad de tesis: "/>
+                                    <h:outputText styleClass="etiqueta_resultBusq" 
+                                                      value="#{bAsignacion.sizeRegistrosTesis}"/> 
+                                </h:panelGroup>
+                            </h:panelGrid>
+                            </center>
+                          <br/>
+                          <!-- h:panelGrid columns="1"  cellpadding="0"  cellspacing="0" border="0"  styleClass="width-table" -->
+                              <p:dataTable id="tbl_datos_tesis" value="#{bAsignacion.arrTesisRecepcion}" var="list_tesis" 
+                                           rendered="#{bAsignacion.sizeRegistrosTesis ne '0'}"                                                                                      
+                                           styleClass="order-table" paginator="true" rows="10" rowsPerPageTemplate="5,10,15,20,25,30,50"
+                                           style="width: 100%"
+                                           paginatorPosition="both" paginatorAlwaysVisible="true" 
+                                           tableStyle="tablecolBusqSimpOrdTrab1,tablecolBusqSimpOrdTrab2,
+                                           tablecolBusqSimpOrdTrab3, tablecolBusqSimpOrdTrab4, 
+                                           tablecolBusqSimpOrdTrab5, tablecolBusqSimpOrdTrab6">
+                                  
+                                  <p:column headerText="Titulo" filterBy="#{list_tesis.objTesis.titulo}" sortBy="#{list_tesis.objTesis.titulo}">
+                                      <h:outputText value="#{list_tesis.objTesis.titulo}"/>
+                                  </p:column>
+                                  
+                                  <p:column headerText="Autor" filterBy="#{list_tesis.objTesis.objAutor.apellidos}" 
+                                            sortBy="#{list_tesis.objTesis.objAutor.apellidos}">
+                                      <h:outputText value="#{list_tesis.objTesis.objAutor.apellidos}"/>
+                                  </p:column>
+                                  
+                                  <p:column headerText="Escuela" filterBy="#{list_tesis.objTesis.objLinea.objEscuela.nombre}" 
+                                            sortBy="#{list_tesis.objTesis.objLinea.objEscuela.nombre}">
+                                      <h:outputText value="#{list_tesis.objTesis.objLinea.objEscuela.nombre}"/>
+                                  </p:column>
+                                  
+                                  <!-- p:column headerText="Linea" filterBy="# {list_tesis.objTesis.objLinea.nombre}" 
+                                            sortBy="# {list_tesis.objTesis.objLinea.nombre}">
+                                      <h:outputText value="# {list_tesis.objTesis.objLinea.nombre}"/>
+                                  </p:column -->
+                                  
+                                  <p:column headerText="Esquema" filterBy="#{list_tesis.objTesis.objEsquema.descripcion}" 
+                                            sortBy="#{list_tesis.objTesis.objEsquema.descripcion}">
+                                      <h:outputText value="#{list_tesis.objTesis.objEsquema.descripcion}"/>
+                                  </p:column>
+                                  
+                                  <p:column headerText="Recepción" width="100" >
+                                      <h:outputText value="#{list_tesis.fecha_recepcion}"/>
+                                  </p:column>
+                                  
+                                  <!-- p:column headerText="Registrada" width="100" >
+                                      <h:outputText value="# {list_tesis.objTesis.fecha_registro}"/>
+                                  </p:column -->
+                                  
+                                  <!-- p:column headerText="Detalles" exportable="false" width="100">
+                                      <p:commandLink  id="ver" title="ver" value="ver" styleClass="boton"
+                                                      action="# {bTesis.mostrarDetalleTesis(list_tesis)}" 
+                                                      actionListener="# {bTesis.onClickCambio}" async="true" 
+                                                      update=":AsignacionTabView, :AsignacionTabView:form_ver_detalle_tesis" >
+                                          <f:attribute name="param" value="# {1}" />
+                                      </p:commandLink>
+                                  </p:column -->
+                                  
+                                  <p:column headerText="Asignar" style="width:100px;text-align: center">
+                                        <p:commandButton update=":AsignacionTabView:form_asignar:popAsig" 
+                                                         oncomplete="PF('asigRev').show()" async="true"
+                                                         icon="fa-mail-forward" title="Asignar">
+                                            <f:setPropertyActionListener value="#{list_tesis}" target="#{bAsignacion.selectTesisRecep}" />
+                                       </p:commandButton>
+                                   </p:column>
+                                  
+                              </p:dataTable>
+                              
+                          <!-- /h:panelGrid -->
+                          
+                      </p:panel>
+                      
+                  </h:form>
+                  <h:form id="form_asignar">
+                    <p:dialog header="Asignar Revisor" widgetVar="asigRev" resizable="false" 
+                              id="asigRev" showEffect="fade" hideEffect="explode" modal="false"
+                              width="40%">
+                        <p:panel id="popAsig" style="width: 100%">
+                            <p:growl globalOnly="true"  id="estRegAsignacion" sticky="false"  showDetail="true"  /> 
+                            <center>
+                            <h:panelGrid columns="1" cellpadding="4" style="text-align: center; width: 100%">
+                                <p:graphicImage value="resources/img/revision.jpg" width="70"  />   
+                                <h:outputText value="Tesis: " style="font-weight: bold;" />
+                                <h:outputText value="#{bAsignacion.selectTesisRecep.objTesis.titulo}" />
+                                <h:outputText value="Autor: " style="font-weight: bold;" />
+                                <h:outputText value="#{bAsignacion.selectTesisRecep.objTesis.objAutor.apellidos}" />
+                                <br/>
+                                <h:outputText value="Asignar a: " style="font-weight: bold;" />
+                                <h:panelGroup>
+                                    <p:selectOneMenu id="revisor" filter="true"
+                                                     value="#{bAsignacion.objAsignacionReg.objRevisor.id_persona}"
+                                                     filterMatchMode="contains" effect="fade" panelStyle="width:20px" style="width:78%" >                                
+                                       <f:selectItem itemLabel="Revisor" itemValue="" noSelectionOption="true" />
+                                       <f:selectItems value="#{bPersona.doListarComboPersonaFuncion(3)}" var="var"  
+                                                      itemLabel="#{var.apellidos}" itemValue="#{var.id_persona}"/>
+                                   </p:selectOneMenu>
+                                   <h:message for="revisor" showDetail="false" showSummary="true" styleClass="errors"/>
+                               </h:panelGroup>
+                                <br/>
+                                <p:commandButton  value="Asignar" async="true"
+                                                  actionListener="#{bAsignacion.doRegistroAsignacion()}"
+                                                  update="estRegAsignacion,asigRev,AsignacionTabView:form_mostrar_listado"
+                                                  oncomplete="asigRev.hide()"/>
+                            </h:panelGrid>
+                            </center>
+                        </p:panel>
+                    </p:dialog>
+                </h:form>
+              </p:tab>   
+              
+              <!-- todas las asignaciones realizadas  -->
+              <p:tab id="tab_asignaciones" title="#{msg.asignacion}">
+                  <h:form id="form_mostrar_asignaciones">
+                      <p:panel id="datos_asign" header="Listado Asignaciones" styleClass="border">                          
+                          <h:panelGrid columns="4" cellpadding="2"  cellspacing="2" style="text-align: center;" width="100%">
+                              
+                              <p:commandButton id="saveBtn" icon="ui-icon-search" actionListener="#{bAsignacion.doListarAsiganaciones_all()}"  
+                                                 value="Actualizar" async="true" update="form_mostrar_asignaciones:datos_asign"/>     
+                            </h:panelGrid> 
+                          <p:blockUI block="datos_asign" trigger="saveBtn">                                               
+                                Generando Listado... <br />
+                                <p:graphicImage value="resources/img/cargando.gif" />   
+                            </p:blockUI>
+                          
+                          <center>  
+                              <h:panelGrid columns="1" rendered="#{bAsignacion.sizeRegistrosAsig_aux  ne '0'}"> 
+                                <h:panelGroup>                                   
+                                    <h:outputText styleClass="etiqueta_resultBusq" value="Asignaciones: "/>
+                                    <h:outputText styleClass="etiqueta_resultBusq" 
+                                                      value="#{bAsignacion.sizeRegistrosAsig_aux}"/> 
+                                </h:panelGroup>
+                            </h:panelGrid>
+                            </center>
+                          <br/>
+                          <h:panelGrid columns="1"  cellpadding="0"  cellspacing="0" border="0"  styleClass="width-table">
+                          <p:dataTable id="tbl_datos_asign" value="#{bAsignacion.arrAsignacion_aux}" var="list_asig" 
+                                       rendered="#{bAsignacion.sizeRegistrosAsig_aux ne '0'}"                                                                                      
+                                           styleClass="order-table" paginator="true" rows="10" rowsPerPageTemplate="5,10,15,20,25,30,50"
+                                           style="width: 100%"
+                                           paginatorPosition="both" paginatorAlwaysVisible="true" 
+                                           tableStyle="tablecolBusqSimpOrdTrab1,tablecolBusqSimpOrdTrab2,
+                                           tablecolBusqSimpOrdTrab3, tablecolBusqSimpOrdTrab4, 
+                                           tablecolBusqSimpOrdTrab5, tablecolBusqSimpOrdTrab6">
+                                  
+                              <p:column headerText="Titulo" filterBy="#{list_asig.objTesisRecpcion.objTesis.titulo}" 
+                                        sortBy="#{list_asig.objTesisRecpcion.objTesis.titulo}">
+                                      <h:outputText value="#{list_asig.objTesisRecpcion.objTesis.titulo}"/>
+                                  </p:column>
+                                  
+                              <p:column headerText="Esquema" filterBy="#{list_asig.objTesisRecpcion.objTesis.objEsquema.descripcion}" 
+                                            sortBy="#{list_asig.objTesisRecpcion.objTesis.objEsquema.descripcion}">
+                                      <h:outputText value="#{list_asig.objTesisRecpcion.objTesis.objEsquema.descripcion}"/>
+                                  </p:column>
+                                  
+                              <p:column headerText="Escuela" filterBy="#{list_asig.objTesisRecpcion.objTesis.objLinea.objEscuela.nombre}" 
+                                            sortBy="#{list_asig.objTesisRecpcion.objTesis.objLinea.objEscuela.nombre}">
+                                      <h:outputText value="#{list_asig.objTesisRecpcion.objTesis.objLinea.objEscuela.nombre}"/>
+                                  </p:column>
+                                  
+                              <p:column headerText="Autor" filterBy="#{list_asig.objTesisRecpcion.objTesis.objAutor.apellidos}" 
+                                            sortBy="#{list_asig.objTesisRecpcion.objTesis.objAutor.apellidos}">
+                                      <h:outputText value="#{list_asig.objTesisRecpcion.objTesis.objAutor.apellidos}"/>
+                                  </p:column>
+                                  
+                              <p:column headerText="Revisor" filterBy="#{list_asig.objRevisor.apellidos}" 
+                                            sortBy="#{list_asig.objRevisor.apellidos}">
+                                      <h:outputText value="#{list_asig.objRevisor.apellidos}"/>
+                                  </p:column>
+                              
+                              <p:column headerText="Fecha" filterBy="#{list_asig.fecha_asignacion}" 
+                                            sortBy="#{list_asig.fecha_asignacion}">
+                                      <h:outputText value="#{list_asig.fecha_asignacion}"/>
+                                  </p:column>
+                              
+                              <p:column headerText="Estado" filterBy="#{list_asig.estado_d}" 
+                                            sortBy="#{list_asig.estado_d}">
+                                      <h:outputText value="#{list_asig.estado_d}"/>
+                                  </p:column>                                                                                                      
+                                  
+                              </p:dataTable>
+                              
+                          </h:panelGrid>
+                          
+                      </p:panel>
+                      
+                  </h:form>
+                  
+              </p:tab>     
+       
+          </p:tabView>
+          
+       </ui:define>
+   </ui:composition>
+        
+</h:body>
+</html>

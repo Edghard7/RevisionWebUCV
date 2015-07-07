@@ -1,0 +1,79 @@
+
+root { 
+    display: block;
+}
+
+body{
+    background-color: #154373;
+    font-family: sans-serif;
+    font-size: 12px;
+    text-align: justify;
+}
+*.border{
+    border-style: solid;
+    border-width: 1px;
+    border-color: white;
+    background-color:papayawhip; 
+    
+    border-right-width: 5px;
+    border-left-width: 5px;
+    border-bottom-width: 5px;
+    border-top-width: 10px;
+}
+*.etiquetas{
+
+    background-color:dodgerblue; 
+    border-color: aqua; 
+    width: 200px;
+    height: 50px;
+}
+.titulo{
+    font-size: 18px;
+    color:#000066;
+    text-align: justify;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/*--------MENU SUPERIOR--------*/
+#playout{
+    width: 500px;
+    height: 900px;
+    margin: 0 auto 0 auto;
+}
+.ui-layout-north{
+    z-index: 50 !important;
+    overflow: visible !important;
+}
+.ui-layout-north .ui-layout-unit-content{
+    overflow: visible !important;
+}
+#playout #menu{
+    height: auto;
+}
+#playout #panel_izquierdo{
+    size: 250px;
+    height: auto;
+}
+/*-----------------------------*/
+.menu{
+    width: 100%;
+    padding: 10px;
+}
+
+.boton {
+  -webkit-border-radius: 28px;
+  -moz-border-radius: 28px;
+  border-radius: 28px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 15px;
+  background: #9bb7bd;
+  padding: 10px 20px 10px 20px;
+  text-decoration: none;
+}
+
+.boton:hover {
+  background: #93c3cd;
+  text-decoration: none;
+}

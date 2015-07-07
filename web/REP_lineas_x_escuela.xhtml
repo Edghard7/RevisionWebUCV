@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+    </h:head>
+    <h:body>
+        <ui:composition template="/WEB-INF/facelets/templates/template_pagina.xhtml">
+            <ui:define name="contenido">
+                <h:outputText value="No tiene acceso a este contenido" class="titulo"  rendered="#{bUsuario.getPermisos('2') eq '0'}" />
+                <p:panel id="encabezado" style="text-align: center"  rendered="#{bUsuario.getPermisos('2') ne '0'}">
+                    <h:outputText value="Nro de Líneas de investigación por escuela" class="titulo" />
+                </p:panel>
+                <center>
+                <p:panel rendered="#{bUsuario.getPermisos('2') ne '0'}" >
+                    <h:form id="form_reporte">
+                        <h:panelGrid columns="3" cellpadding="4"  cellspacing="4" style="text-align: center">
+                            <h:outputLabel  value="Seleccione la escuela: " />
+                            <h:panelGroup>
+                                <p:selectOneMenu id="escuela" required="true" requiredMessage="#{msg.requerido}" filter="true"
+                                                 value="#{bChart.id_escuela}"
+                                                 filterMatchMode="contains" effect="fade" panelStyle="width:20px" style="width:250px" > 
+                                    <p:ajax listener="#{bChart.cargarLineasTesis()}" update="form_mostrar_reporte" async="true" />
+                                   <f:selectItem itemLabel="Escuela" itemValue="" noSelectionOption="true" />
+                                   <f:selectItems value="#{bEscuela.doListarComboEscuela()}" var="var"  
+                                                  itemLabel="#{var.nombre}" itemValue="#{var.id_escuela}"/>
+                               </p:selectOneMenu>
+                               <h:message for="escuela" showDetail="false" showSummary="true" styleClass="errors"/>
+                           </h:panelGroup>
+                        </h:panelGrid>
+                        <!-- p:commandButton   value="Mostrar" id="search" update="reportPie" actionListener="# {bChart.cargarLineasTesis()}" async="true" /-->
+                    </h:form>
+                    <h:form id="form_mostrar_reporte" >
+                        <h:outputText rendered="#{bChart.sizeRegistrosArrLinea eq '0'}" value="No se han encontrado datos para mostrar" />
+                        <p:panel id="reportPie" header="Nro de Líneas de investigación por escuela"  
+                                 rendered="#{bChart.sizeRegistrosArrLinea ne '0'}" widgetVar="reportPie"
+                                 closable="true" toggleable="true">                            
+                            
+                                
+                            <p:chart id="pieEscLin" type="pie" model="#{bChart.createPieLineasInv_x_Escuela()}" style="width:700px;height:500px" widgetVar="chart"/>
+             
+                                <p:commandButton type="button" value="Guardar como imagen" icon="ui-icon-extlink" onclick="exportChart()"/>
+
+                                <p:dialog widgetVar="dlg" showEffect="fade" modal="false" header="Guardar como imagen" resizable="true">
+                                    <p:outputPanel id="output" layout="block" style="width:700px;height:500px"/>
+                                    
+                                </p:dialog>
+                                <script type="text/javascript">
+                                function exportChart() {
+                                    //export image
+                                    $('#form_mostrar_reporte\\:output').empty().append(PF('chart').exportAsImage());
+
+                                    //show the dialog
+                                    PF('dlg').show();
+                                }
+                                </script>
+                        </p:panel>
+                    
+                    </h:form>
+                    
+                    
+                </p:panel>
+                </center>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
+

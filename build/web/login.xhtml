@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core" 
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+    <h:body>
+        <ui:composition template="/WEB-INF/facelets/templates/template_login.xhtml">
+            <ui:define name="content">
+
+                <section class="container">
+                    <div class="login">
+                      <h1>Acceso</h1>
+                      <h:form id="acceso">
+                          <p:panel id="nuevo_acceso" >
+                              <p:growl id="estado" sticky="true" showDetail="true"/>
+                               <h:panelGrid columns="1">
+                                        <h:outputLabel for="nom_usuario" value="(*)Usuario "/>
+                                        <h:panelGroup >
+                                            <p:inputText value="#{bUsuario.nombre_user}" id="nom_usuario" required="true" 
+                                                         requiredMessage="Ingrese Usuario"
+                                                         title="Maximo 20 caracteres" style="width: 98%" >
+                                                <f:validateLength minimum="2" maximum="20"/>
+                                            </p:inputText>
+                                            <p:tooltip for="nom_usuario" showEvent="focus" hideEvent="blur"/>
+                                            <p:message for="nom_usuario" display="icon"/>
+                                        </h:panelGroup><br/>
+
+                                        <h:outputLabel  value="(*)Contraseña "/>
+                                            <h:panelGroup>
+                                                <p:keyboard value="#{bUsuario.clave_user}" password="true" required="true" 
+                                                            requiredMessage="Ingrese Contraseña" label="Contraseña"  style="width: 98%" />
+                                            </h:panelGroup><br/>                
+                                        <p:commandButton value="Aceptar" id="accesoUsuario" action="#{bUsuario.loginUsuario()}" 
+                                                         global="false" style="margin-left:5px; float: right" update="estado,acceso">
+                                        </p:commandButton><br/>
+                            </h:panelGrid>
+                          </p:panel>
+                          
+                      </h:form>
+                    </div>
+                  </section>
+                
+            </ui:define>            
+        </ui:composition>
+    </h:body>
+</html>
